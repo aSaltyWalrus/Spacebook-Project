@@ -33,6 +33,7 @@ class App extends Component{
 					<Tab.Screen name="Profile" component={Profile} />
 					<Tab.Screen name="Friends" component={Friends} />
 				</Tab.Navigator>
+
 */
 
 export default App;
