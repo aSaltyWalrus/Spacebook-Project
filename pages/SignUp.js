@@ -1,12 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, TextInput, Button, ActivityIndicator, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class SignUp extends Component{
 
     constructor(props){
         super(props);
-
         this.state = {
             isLoading: true,
             email: "",
@@ -34,11 +34,55 @@ class SignUp extends Component{
             body: JSON.stringify(to_send)
         })
 
-        // TODO: have the new account load after its created
-
+        .then((response) => {
+            if(response.status === 201){
+                this.signIn()
+            }else if(response.status === 400){
+                throw 'invalid credentials';
+            }else{
+                throw 'unknown error';
+            }
+        })
+       
         .catch((error) => {
             console.log(error);
         })
+    }
+
+    signIn = () => {
+        console.log("signing in...");
+        let to_send = {
+            email: this.state.email,
+            password: this.state.password
+        };
+
+        return fetch("http://localhost:3333/api/1.0.0/login", {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(to_send)
+        })
+        
+       .then((response) => {
+            if(response.status === 200){
+                return response.json()
+            }else if(response.status === 400){
+                throw 'incorrect login credentials';
+            }else{
+                throw 'unknown error';
+            }
+        })
+        
+       .then(async (responseJson) => {
+            console.log(responseJson);
+            await AsyncStorage.setItem('@session_token', responseJson.token);
+            this.props.navigation.navigate("Profile", {id:responseJson.id});
+        })
+
+       .catch((error) => {
+            console.log(error);
+       })
     }
 
     render(){

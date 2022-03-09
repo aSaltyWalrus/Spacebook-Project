@@ -46,7 +46,7 @@ class Login extends Component{
        .then(async (responseJson) => {
             console.log(responseJson);
             await AsyncStorage.setItem('@session_token', responseJson.token);
-            this.props.navigation.navigate("Friends", {id:responseJson.token});
+            this.props.navigation.navigate("Profile", {id:responseJson.id});
         })
 
        .catch((error) => {

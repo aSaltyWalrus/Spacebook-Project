@@ -8,16 +8,12 @@ class Profile extends Component{
     super(props);
     this.state = {
         isLoading: true,
-        email: "",
-        password: "",
-        firstName: "",
-        secondName: "",
         profileData: [],
+        profileID: this.props.route.params.id
     };
   }
 
     componentDidMount() {
-      this.getProfileData();
       this.unsubscribe = this.props.navigation.addListener('focus', () => {
         this.checkLoggedIn();
         this.getProfileData();
@@ -32,7 +28,7 @@ class Profile extends Component{
 
   getProfileData = async () => {
     const token = await AsyncStorage.getItem('@session_token');
-    return fetch("http://localhost:3333/api/1.0.0/user/" + 1, {
+    return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
       'headers': {
         'X-Authorization':  token
       }
@@ -61,7 +57,7 @@ class Profile extends Component{
 
   getProfilePosts = async () => {
     const token = await AsyncStorage.getItem('@session_token');
-    return fetch("http://localhost:3333/api/1.0.0/user/" + 1, {
+    return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
       'headers': {
         'X-Authorization':  token
       }
@@ -128,6 +124,10 @@ class Profile extends Component{
 
 
             <Text>Test to show the page loaded</Text>
+            <Button
+              onPress={() => this.props.navigation.push("Friends", {id:this.state.profileID})}
+              title="Friends"
+            />
           </View>
         </View>
       );
