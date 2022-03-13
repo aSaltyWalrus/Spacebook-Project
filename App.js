@@ -29,6 +29,8 @@ class App extends Component{
 }
 
 /*
+
+cc
 				<Tab.Navigator>
 					<Tab.Screen name="Profile" component={Profile} />
 					<Tab.Screen name="Friends" component={Friends} />

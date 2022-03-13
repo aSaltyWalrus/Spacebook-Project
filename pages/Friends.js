@@ -22,7 +22,6 @@ class Friends extends Component{
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
       this.getFriendsData();
-      this.getFriendRequests();
     }); 
   }
 
@@ -34,7 +33,6 @@ class Friends extends Component{
   getFriendsData = async () => {
     const token = await AsyncStorage.getItem('@session_token');
     this.setState({sessionToken: token})
-    console.log(this.state.sessionToken)
     return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/friends", {
       'headers': {
         'X-Authorization':  token
@@ -58,6 +56,7 @@ class Friends extends Component{
       this.setState({  
         friendsData: responseJson,
       })
+      this.getFriendRequests(); // after the friend data is loaded, load the friend request data
     })
     .catch((error) => {
       console.log(error);
@@ -73,7 +72,7 @@ class Friends extends Component{
       },
     })
     .then((response) => {
-    if(response.status === 200){
+      if(response.status === 200){
         return response.json()
       }
       else if(response.status === 401){
@@ -93,11 +92,10 @@ class Friends extends Component{
     })
   }
 
-  getFriendRequests() = async () => {
-    const token = await AsyncStorage.getItem('@session_token');
+  getFriendRequests() {
     return fetch("http://localhost:3333/api/1.0.0/friendrequests", {
       'headers': {
-        'X-Authorization':  token
+        'X-Authorization':  this.state.sessionToken
       }
     })
     .then((response) => {
@@ -114,7 +112,7 @@ class Friends extends Component{
     .then((responseJson) => {
       this.setState({  
         isLoading: false,
-        friendsData: responseJson,
+        friendRequestsData: responseJson,
       })
     })
     .catch((error) => {
@@ -132,6 +130,31 @@ class Friends extends Component{
     })
     .then((response) => {
       if(response.status === 200){
+        throw 'success';
+      }
+      else if(response.status === 401){
+        throw 'Error: not authorized';
+      }
+      else if(response.status === 403){
+        throw 'Error: already sent request';
+      }
+      else{
+        throw 'Error: check server response';
+      }
+    })
+  }
+
+  acceptFriendRequest(theirID)  {
+    return fetch("http://localhost:3333/api/1.0.0/friendrequests/" + theirID, {
+      method: "post",
+      headers: {
+        'X-Authorization':  this.state.sessionToken
+      },
+    })
+    .then((response) => {
+      if(response.status === 200){
+        this.getFriendsData();
+        this.getFriendRequests();
         throw 'success';
       }
       else if(response.status === 401){
@@ -194,7 +217,7 @@ class Friends extends Component{
               data={this.state.friendsData}
               renderItem={({item}) => ( 
                 <View>
-                  <Text>Name: {item.user_givenname} {item.user_familyname} </Text>
+                  <Text>Name: {item.user_givenname} {item.user_familyname}</Text>
                   <Text>Email: {item.user_email} </Text>
                   <Button
                     onPress={() => this.props.navigation.push("Profile", {id:item.user_id})}
@@ -214,6 +237,10 @@ class Friends extends Component{
                   <Button
                     onPress={() => this.props.navigation.push("Profile", {id:item.user_id})}
                     title="View Profile"
+                  />
+                  <Button
+                    onPress={() => this.acceptFriendRequest(item.user_id)}
+                    title="Accept Friend"
                   />
                 </View>
               )}
