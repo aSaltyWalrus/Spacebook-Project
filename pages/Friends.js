@@ -153,8 +153,29 @@ class Friends extends Component{
     })
     .then((response) => {
       if(response.status === 200){
-        this.getFriendsData();
-        this.getFriendRequests();
+        this.getFriendsData(); // reload friends
+        this.getFriendRequests(); // reload requests
+        throw 'success';
+      }
+      else if(response.status === 401){
+        throw 'Error: not authorized';
+      }
+      else{
+        throw 'Error: check server response';
+      }
+    })
+  }
+
+  rejectFriendRequest(theirID)  {
+    return fetch("http://localhost:3333/api/1.0.0/friendrequests/" + theirID, {
+      method: "delete",
+      headers: {
+        'X-Authorization':  this.state.sessionToken
+      },
+    })
+    .then((response) => {
+      if(response.status === 200){
+        this.getFriendRequests(); // reload requests
         throw 'success';
       }
       else if(response.status === 401){
@@ -241,6 +262,10 @@ class Friends extends Component{
                   <Button
                     onPress={() => this.acceptFriendRequest(item.user_id)}
                     title="Accept Friend"
+                  />
+                  <Button
+                    onPress={() => this.rejectFriendRequest(item.user_id)}
+                    title="Reject Friend"
                   />
                 </View>
               )}
