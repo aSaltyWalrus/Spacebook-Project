@@ -128,6 +128,7 @@ class Profile extends Component{
               onPress={() => this.props.navigation.push("Friends", {id:this.state.profileID})}
               title="Friends"
             />
+            }
           </View>
         </View>
       );
