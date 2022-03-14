@@ -241,14 +241,23 @@ class Friends extends Component{
                 <View>
                   <Text>Name: {item.user_givenname} {item.user_familyname} </Text>
                   <Text>Email: {item.user_email} </Text>
-                  <Button
-                    onPress={() => this.props.navigation.navigate("Profile", {id:item.user_id})}
-                    title="View Profile"
-                  />
-                  <Button
-                    onPress={() => this.sendFriendRequest(item.user_id)}
-                    title="Add Friend"
-                  />
+                  {this.state.sessionUserID == item.user_id ?
+                    <Button
+                      onPress={() => this.props.navigation.navigate("Profile", {id:item.user_id})}
+                      title="Your Profile"
+                    />
+                    :
+                    <View>
+                      <Button
+                        onPress={() => this.props.navigation.push("Other Profile", {id:item.user_id})}
+                        title="View Profile"
+                      />
+                      <Button
+                        onPress={() => this.sendFriendRequest(item.user_id)}
+                        title="Add Friend"
+                      />
+                    </View>
+                  }
                 </View>
               )}
               keyExtractor={(item, index) => item.user_id}
@@ -262,7 +271,8 @@ class Friends extends Component{
                 <View>
                   <Text>Name: {item.user_givenname} {item.user_familyname}</Text>
                   <Text>Email: {item.user_email} </Text>
-                  {this.state.sessionUserID == item.user_id ?
+                  <View>
+                  {item.user_id == this.state.sessionUserID ?
                     <Button
                       onPress={() => this.props.navigation.navigate("Profile", {id:item.user_id})}
                       title="Your Profile"
@@ -273,13 +283,14 @@ class Friends extends Component{
                       title="View Profile"
                     />
                   }
+                  </View>
                 </View>
               )}
               keyExtractor={(item, index) => item.user_id}
             />
+
+            {this.state.sessionUserID == this.state.profileID ?
             <View>
-
-
             <Text> Friend Requests </Text>
             <FlatList
               data={this.state.friendRequestsData}
@@ -304,6 +315,12 @@ class Friends extends Component{
               keyExtractor={(item, index) => item.user_id}
             />
             </View>
+            :
+            <Button
+              onPress={() => this.props.navigation.popToTop()}
+              title="Back To Your Friends"
+            />
+            }
           </View>
         </View>
       );
@@ -311,6 +328,8 @@ class Friends extends Component{
   }
 }
 
+
+  
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
