@@ -3,7 +3,7 @@ import React, { Component, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, TextInput, Button, ActivityIndicator, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-class SignUp extends Component{
+class UserEdit extends Component{
 
     constructor(props){
         super(props);
@@ -13,7 +13,7 @@ class SignUp extends Component{
             password: "",
             firstName: "",
             secondName: "",
-            id: ""
+            id: "",
             profileData: [],
             profileID: this.props.route.params.id
         }
@@ -182,4 +182,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default SignUp;
+export default UserEdit;

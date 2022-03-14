@@ -9,7 +9,8 @@ class Profile extends Component{
     this.state = {
         isLoading: true,
         profileData: [],
-        profileID: this.props.route.params.id
+        profileID: 0,
+        isUsersProfile: false
     };
   }
 
@@ -28,6 +29,25 @@ class Profile extends Component{
 
   getProfileData = async () => {
     const token = await AsyncStorage.getItem('@session_token');
+    const userID = await AsyncStorage.getItem('@id');
+    console.log(this.props.route.params)
+    if(this.props.route.params != null){
+      this.setState({
+        profileID: this.props.route.params.id,
+        sessionToken: token
+      })
+    }
+    else{
+      this.setState({
+        profileID: userID,
+        sessionToken: token,
+      })
+    }
+    if(this.state.profileID == userID){
+      this.setState({
+        isUsersProfile: true
+      })
+    }
     return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
       'headers': {
         'X-Authorization':  token
@@ -122,12 +142,13 @@ class Profile extends Component{
               keyExtractor={(item, index) => item.user_id.toString()}
             />
 
-
-            <Text>Test to show the page loaded</Text>
-            <Button
-              onPress={() => this.props.navigation.push("Friends", {id:this.state.profileID})}
-              title="Friends"
-            />
+            {!this.state.isUsersProfile ?
+              <Button
+                onPress={() => this.props.navigation.push("Friends", {id:this.state.profileID})}
+                title="Friends"
+              />
+              :
+              <Text> This is you </Text>
             }
           </View>
         </View>

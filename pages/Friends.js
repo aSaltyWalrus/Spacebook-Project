@@ -8,14 +8,16 @@ class Friends extends Component{
     super(props);
 
     this.state = {
-      sessionToken: "cat",
+      sessionToken: "",
       isLoading: true,
+      isUsersFriends: false,
       friendsData: "",
       friendRequestsData: "",
-      profileID: this.props.route.params.id,
+      profileID: 0,
       searchField: "",
       hasSearched: false,
       searchData: "",
+      sessionUserID: 0
     }
   }
 
@@ -32,7 +34,26 @@ class Friends extends Component{
 
   getFriendsData = async () => {
     const token = await AsyncStorage.getItem('@session_token');
-    this.setState({sessionToken: token})
+    const userID = await AsyncStorage.getItem('@id');
+    if(this.props.route.params != null){
+      this.setState({
+        profileID: this.props.route.params.id,
+        sessionToken: token,
+        sessionUserID: userID,
+      })
+    }
+    else{
+      this.setState({
+        profileID: userID,
+        sessionToken: token,
+        sessionUserID: userID,
+      })
+    }
+    if (this.profileID == userID){
+      this.setState({
+        isUsersFriends: true,
+      })
+    }
     return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/friends", {
       'headers': {
         'X-Authorization':  token
@@ -187,7 +208,6 @@ class Friends extends Component{
     })
   }
 
-
   render(){
     if (this.state.isLoading) {
       return (
@@ -222,7 +242,7 @@ class Friends extends Component{
                   <Text>Name: {item.user_givenname} {item.user_familyname} </Text>
                   <Text>Email: {item.user_email} </Text>
                   <Button
-                    onPress={() => this.props.navigation.push("Profile", {id:item.user_id})}
+                    onPress={() => this.props.navigation.navigate("Profile", {id:item.user_id})}
                     title="View Profile"
                   />
                   <Button
@@ -233,6 +253,8 @@ class Friends extends Component{
               )}
               keyExtractor={(item, index) => item.user_id}
             />
+
+
             <Text> Friends </Text>
             <FlatList
               data={this.state.friendsData}
@@ -240,14 +262,24 @@ class Friends extends Component{
                 <View>
                   <Text>Name: {item.user_givenname} {item.user_familyname}</Text>
                   <Text>Email: {item.user_email} </Text>
-                  <Button
-                    onPress={() => this.props.navigation.push("Profile", {id:item.user_id})}
-                    title="View Profile"
-                  />
+                  {this.state.sessionUserID == item.user_id ?
+                    <Button
+                      onPress={() => this.props.navigation.navigate("Profile", {id:item.user_id})}
+                      title="Your Profile"
+                    />
+                    :
+                    <Button
+                      onPress={() => this.props.navigation.push("Other Profile", {id:item.user_id})}
+                      title="View Profile"
+                    />
+                  }
                 </View>
               )}
               keyExtractor={(item, index) => item.user_id}
             />
+            <View>
+
+
             <Text> Friend Requests </Text>
             <FlatList
               data={this.state.friendRequestsData}
@@ -256,7 +288,7 @@ class Friends extends Component{
                   <Text>Name: {item.first_name} {item.last_name} </Text>
                   <Text>Email: {item.email} </Text>
                   <Button
-                    onPress={() => this.props.navigation.push("Profile", {id:item.user_id})}
+                    onPress={() => this.props.navigation.navigate("Profile", {id:item.user_id})}
                     title="View Profile"
                   />
                   <Button
@@ -271,6 +303,7 @@ class Friends extends Component{
               )}
               keyExtractor={(item, index) => item.user_id}
             />
+            </View>
           </View>
         </View>
       );
