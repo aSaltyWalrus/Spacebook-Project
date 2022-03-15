@@ -8,9 +8,10 @@ class Profile extends Component{
         super(props);
         this.state = {
             isLoading: true,
-             profileData: [],
+            profileData: [],
             profileID: 0,
-            isUsersProfile: false
+            isUsersProfile: false,
+            profilePostsData: "",
         };
     }
 
@@ -66,9 +67,9 @@ class Profile extends Component{
 
         .then((responseJson) => {
             this.setState({  
-                isLoading: false,
                 profileData: [responseJson],
             })
+            this.getProfilePosts(); // after the personal data is loaded, load the posts data
         })
 
         .catch((error) => {
@@ -76,11 +77,10 @@ class Profile extends Component{
         })
     }
 
-    getProfilePosts = async () => {
-        const token = await AsyncStorage.getItem('@session_token');
-        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
+    getProfilePosts() {
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/post", {
             'headers': {
-                'X-Authorization':  token
+                'X-Authorization':  this.state.sessionToken
             }
         })
 
@@ -88,7 +88,7 @@ class Profile extends Component{
             if (response.status === 200) {
                 return response.json()
             } else if (response.status === 401) {
-                this.props.navigation.navigate("Login");
+                throw "Error: not authorized";
             } else {
                 throw 'Error: check server response';
             }
@@ -97,7 +97,7 @@ class Profile extends Component{
         .then((responseJson) => {
             this.setState({  
                 isLoading: false,
-                profileData: [responseJson],
+                profilePostsData: responseJson,
             })
         })
 
@@ -137,7 +137,8 @@ class Profile extends Component{
               data={this.state.profileData}
               renderItem={({item}) => ( 
                 <View>
-                  <Text>{item.first_name}</Text>
+                  <Text>{item.first_name} {item.last_name}</Text>
+                  <Text>Email: {item.email}</Text>
                 </View>
               )}
               keyExtractor={(item, index) => item.user_id.toString()}
@@ -149,8 +150,20 @@ class Profile extends Component{
                 title="Friends"
               />
               :
-              <Text> This is you </Text>
+              <Text> This is you [discover others button] </Text>
             }
+
+            <Text>Posts</Text>
+            <FlatList
+              data={this.state.profilePostsData}
+              renderItem={({item}) => ( 
+                <View>
+                  <Text>{item.text}</Text>
+                  <Text>Likes: {item.numLikes}</Text>
+                </View>
+              )}
+              keyExtractor={(item, index) => item.post_id}
+            />
           </View>
         </View>
       );
