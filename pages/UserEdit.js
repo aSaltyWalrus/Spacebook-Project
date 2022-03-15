@@ -8,14 +8,14 @@ class UserEdit extends Component{
     constructor(props){
         super(props);
         this.state = {
+            sessionUserID: 0,
+            sessionToken: "",
             isLoading: true,
-            email: "",
-            password: "",
             firstName: "",
             secondName: "",
-            id: "",
+            email: "",
+            password: "",
             profileData: [],
-            profileID: this.props.route.params.id
         }
     }
 
@@ -27,10 +27,16 @@ class UserEdit extends Component{
 
     getProfileData = async () => {
         const token = await AsyncStorage.getItem('@session_token');
+        const userID = await AsyncStorage.getItem('@id');
+        
+        this.setState({
+            sessionToken: token,
+            sessionUserID: userID,
+        })
 
-        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.sessionUserID, {
             'headers': {
-                'X-Authorization':  token
+                'X-Authorization':  token,
             }
         })
 
@@ -47,11 +53,7 @@ class UserEdit extends Component{
         .then((responseJson) => {
             this.setState({  
                 isLoading: false,
-                id: responseJson.user_id,
-                email: responseJson.email,
-                password: responseJson.password,
-                firstName: responseJson.first_name,
-                secondName: responseJson.last_name,
+                profileData: [responseJson]
             })
         })
 
@@ -60,25 +62,33 @@ class UserEdit extends Component{
         })
     }
 
-    editUser = () => {
-        let to_send = {
-            first_name: this.state.firstName,
-            last_name: this.state.secondName,
-            email: this.state.email,
-            password: this.state.password,
-        };
+    editUser() {
+        let to_send = {};
 
-        return fetch("http://localhost:3333/api/1.0.0/user", {
-            method: "patch",
+        if (this.state.firstName != "") { to_send['first_name'] = this.state.firstName; }
+        if (this.state.secondName != "") { to_send['last_name'] = this.state.secondName; }
+        if (this.state.email != "") { to_send['email'] = this.state.email; }
+        if (this.state.password != "") { to_send['password'] = this.state.password; }
+
+        console.log(JSON.stringify(to_send));
+
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.sessionUserID, {
+            method: "PATCH",
             headers: {
-                "Content-Type": "application/json"
+                'X-Authorization':  this.state.sessionToken,
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(to_send)
         })
 
         .then((response) => {
-            if (response.status === 201) {
-                // todo
+            if (response.status === 200) {
+                this.setState({  
+                    firstName: "",
+                    secondName: "",
+                    email: "",
+                    password: "",
+                })
             } else if (response.status === 400) {
                 throw 'invalid credentials';
             } else {
@@ -90,6 +100,7 @@ class UserEdit extends Component{
             console.log(error);
         })
     }
+
 
     render(){
 
@@ -142,6 +153,13 @@ class UserEdit extends Component{
                 <Button
                     onPress={() => this.editUser()}
                     title="Commit Changes"
+                />
+            </View>
+
+            <View style={styles.container}>
+                <Button
+                    onPress={() => this.logout()}
+                    title="Logout"
                 />
             </View>
             

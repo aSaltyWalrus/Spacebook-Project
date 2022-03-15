@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TextInput, ActivityIndicator, FlatList, Button} from 'react-native';
+import { StyleSheet, Text, View, TextInput, ActivityIndicator, FlatList, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class Profile extends Component{
@@ -151,6 +151,31 @@ class Profile extends Component{
         })
     }
 
+    deletePost(post_id) {
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/post/" + post_id, {
+            method: "delete",
+            headers: {
+                'X-Authorization':  this.state.sessionToken
+            },
+        })
+
+        .then((response) => {
+            if(response.status === 200){
+                this.getProfilePosts() // reload profile posts
+            } else if (response.status === 401) {
+                throw 'Error: not authorised';
+            } else if(response.status === 403) {
+                throw 'Error: forbidden'; 
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+       
+        .catch((error) => {
+            console.log(error);
+        })
+    }
+
     likePost(post_id) {
         return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/post/" + post_id + "/like", {
             method: "post",
@@ -165,7 +190,7 @@ class Profile extends Component{
             } else if (response.status === 401) {
                 throw 'Error: not authorised';
             } else if(response.status === 403) {
-                throw 'Error: post already liked'; 
+                throw 'Error: frobidden'; 
             } else {
                 throw 'Error: check server response';
             }
@@ -262,14 +287,26 @@ class Profile extends Component{
                     <Text>{item.author.first_name} {item.author.last_name}</Text>
                     <Text>{item.text}</Text>
                     <Text>Likes: {item.numLikes}</Text>
-                    <Button
-                      onPress={() => this.likePost(item.post_id)}
-                      title="Like"
-                    />
-                    <Button
-                      onPress={() => this.unlikePost(item.post_id)}
-                      title="Unlike"
-                    />
+                    
+                    {item.author.user_id == this.state.sessionUserID || this.state.isUsersProfile ?
+                      <View>
+                        <Button
+                          onPress={() => this.deletePost(item.post_id)}
+                          title="Delete"
+                        />
+                      </View>
+                      :
+                      <View>
+                        <Button
+                          onPress={() => this.likePost(item.post_id)}
+                          title="Like"
+                        />
+                        <Button
+                          onPress={() => this.unlikePost(item.post_id)}
+                          title="Unlike"
+                        />
+                      </View>
+                    }
                   </View>
                 )}
                 keyExtractor={(item, index) => item.post_id}
