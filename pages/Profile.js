@@ -7,6 +7,8 @@ class Profile extends Component{
     constructor(props){
         super(props);
         this.state = {
+            sessionToken: "",
+            sessionUserID: 0,
             isLoading: true,
             profileData: [],
             profileID: 0,
@@ -44,12 +46,14 @@ class Profile extends Component{
         if (this.props.route.params != null) {
             this.setState({
                 profileID: this.props.route.params.id,
-                sessionToken: token
+                sessionToken: token,
+                sessionUserID: userID,
             })
         } else {
             this.setState({
                 profileID: userID,
                 sessionToken: token,
+                sessionUserID: userID,
             })
         } 
         if (this.state.profileID == userID) {
@@ -132,13 +136,64 @@ class Profile extends Component{
         })
 
         .then((response) => {
-            if(response.status === 201){
+            if (response.status === 201) {
                 this.setState({ newPostText: "" }) // reset the post text
                 this.getProfilePosts() // reload profile posts
-            }else if(response.status === 401){
+            } else if(response.status === 401) {
                 throw 'Error: not authorised';
-            }else{
-                throw 'unknown error';
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+       
+        .catch((error) => {
+            console.log(error);
+        })
+    }
+
+    likePost(post_id) {
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/post/" + post_id + "/like", {
+            method: "post",
+            headers: {
+                'X-Authorization':  this.state.sessionToken
+            },
+        })
+
+        .then((response) => {
+            if(response.status === 200){
+                this.getProfilePosts() // reload profile posts
+            } else if (response.status === 401) {
+                throw 'Error: not authorised';
+            } else if(response.status === 403) {
+                throw 'Error: post already liked'; 
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+       
+        .catch((error) => {
+            console.log(error);
+        })
+    }
+
+
+    unlikePost(post_id) {
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/post/" + post_id + "/like", {
+            method: "delete",
+            headers: {
+                'X-Authorization':  this.state.sessionToken
+            },
+        })
+
+        .then((response) => {
+            if(response.status === 200){
+                this.getProfilePosts() // reload profile posts
+            } else if (response.status === 401) {
+                throw 'Error: not authorised';
+            } else if(response.status === 403) {
+                throw 'Error: forbidden'; 
+            } else {
+                throw 'Error: check server response';
             }
         })
        
@@ -204,8 +259,17 @@ class Profile extends Component{
                 data={this.state.profilePostsData}
                 renderItem={({item}) => ( 
                   <View>
+                    <Text>{item.author.first_name} {item.author.last_name}</Text>
                     <Text>{item.text}</Text>
                     <Text>Likes: {item.numLikes}</Text>
+                    <Button
+                      onPress={() => this.likePost(item.post_id)}
+                      title="Like"
+                    />
+                    <Button
+                      onPress={() => this.unlikePost(item.post_id)}
+                      title="Unlike"
+                    />
                   </View>
                 )}
                 keyExtractor={(item, index) => item.post_id}
