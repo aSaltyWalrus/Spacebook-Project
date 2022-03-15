@@ -20,43 +20,45 @@ class UserEdit extends Component{
     }
 
     componentDidMount() {
-      this.unsubscribe = this.props.navigation.addListener('focus', () => {
-        this.getProfileData();
-      }); 
+        this.unsubscribe = this.props.navigation.addListener('focus', () => {
+            this.getProfileData();
+        }); 
     }
 
     getProfileData = async () => {
-    const token = await AsyncStorage.getItem('@session_token');
-    return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
-      'headers': {
-        'X-Authorization':  token
-      }
-    })
-    .then((response) => {
-      if(response.status === 200){
-        return response.json()
-      }
-      else if(response.status === 401){
-        this.props.navigation.navigate("Login");
-      }
-      else{
-        throw 'Error: check server response';
-      }
-    })
-    .then((responseJson) => {
-      this.setState({  
-        isLoading: false,
-        id: responseJson.user_id,
-        email: responseJson.email,
-        password: responseJson.password,
-        firstName: responseJson.first_name,
-        secondName: responseJson.last_name,
-      })
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-  }
+        const token = await AsyncStorage.getItem('@session_token');
+
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
+            'headers': {
+                'X-Authorization':  token
+            }
+        })
+
+        .then((response) => {
+            if (response.status === 200) {
+                return response.json()
+            } else if (response.status === 401) {
+                this.props.navigation.navigate("Login");
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+
+        .then((responseJson) => {
+            this.setState({  
+                isLoading: false,
+                id: responseJson.user_id,
+                email: responseJson.email,
+                password: responseJson.password,
+                firstName: responseJson.first_name,
+                secondName: responseJson.last_name,
+            })
+        })
+
+        .catch((error) => {
+            console.log(error);
+        })
+    }
 
     editUser = () => {
         let to_send = {
@@ -75,12 +77,11 @@ class UserEdit extends Component{
         })
 
         .then((response) => {
-            if(response.status === 201){
-                //this.props.navigation.push("Profile", {id:item.user_id})
-                this
-            }else if(response.status === 400){
+            if (response.status === 201) {
+                // todo
+            } else if (response.status === 400) {
                 throw 'invalid credentials';
-            }else{
+            } else {
                 throw 'unknown error';
             }
         })

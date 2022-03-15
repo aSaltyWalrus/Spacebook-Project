@@ -1,13 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, TextInput, Button, ActivityIndicator, Alert } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class Login extends Component{
 
     constructor(props){
         super(props);
-
         this.state = {
             email: "",
             password: "",
@@ -30,21 +29,18 @@ class Login extends Component{
             },
             body: JSON.stringify(to_send)
         })
-
-        // TODO: have the login
         
        .then((response) => {
-            if(response.status === 200){
+            if (response.status === 200){
                 return response.json()
-            }else if(response.status === 400){
+            } else if (response.status === 400){
                 throw 'incorrect login credentials';
-            }else{
+            } else {
                 throw 'unknown error';
             }
         })
         
-       .then(async (responseJson) => {
-            console.log(responseJson);
+       .then( async (responseJson) => {
             await AsyncStorage.setItem('@session_token', responseJson.token);
             await AsyncStorage.setItem('@id', responseJson.id);
             this.props.navigation.navigate("App");
@@ -59,30 +55,30 @@ class Login extends Component{
 
       const navigation = this.props.navigation;
 
-
       return (
         <ScrollView>
-        <View style={styles.screen}>
+          <View style={styles.screen}>
+
             <View style={styles.container}>
-                <Text style={styles.formTitles}>SPACEBOOK</Text>
+              <Text style={styles.formTitles}>SPACEBOOK</Text>
             </View>
 
             <View style={styles.container}>
-                <Text style={styles.formTitles}>email</Text>
-                <TextInput
-                    style={styles.formInputs}
-                    onChangeText={(email) => this.setState({email})}
-                    value={this.state.email}
-                />
+              <Text style={styles.formTitles}>email</Text>
+              <TextInput
+                style={styles.formInputs}
+                onChangeText={(email) => this.setState({email})}
+                value={this.state.email}
+              />
             </View>
 
             <View style={styles.container}>
-                <Text style={styles.formTitles}>password</Text>
-                <TextInput
-                    style={styles.formInputs}
-                    onChangeText={(password) => this.setState({password})}
-                    value={this.state.password}
-                />
+              <Text style={styles.formTitles}>password</Text>
+              <TextInput
+                style={styles.formInputs}
+                onChangeText={(password) => this.setState({password})}
+                value={this.state.password}
+              />
             </View>
 
             <View style={styles.buttonContainer}> 
@@ -92,13 +88,13 @@ class Login extends Component{
                 />
                 <Button
                     onPress={() => this.signIn()}
-                    //onPress={ () => navigation.navigate("Profile") }
                     title="Login"
                 />
             </View>
             
             <StatusBar style="auto" />
-        </View>
+
+          </View>
         </ScrollView>
 
       );

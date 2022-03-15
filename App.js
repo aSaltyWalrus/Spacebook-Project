@@ -27,17 +27,14 @@ class App extends Component{
 		);
 	}
 }
-/*<Tab.Screen name="Login" component={Login} options={{tabBarShowLabel:false}} />
-					<Tab.Screen name="SignUp" component={SignUp} options={{tabBarShowLabel:false}} />*/
-
 
 class BrowseUsers extends Component{
 	render(){
 		return (
-				<Stack.Navigator>
-					<Stack.Screen name="Friends" component={Friends} />
-					<Stack.Screen name="Other Profile" component={Profile} />
-				</Stack.Navigator>
+			<Stack.Navigator>
+				<Stack.Screen name="Friends" component={Friends} />
+				<Stack.Screen name="Other Profile" component={Profile} />
+			</Stack.Navigator>
 		);
 	}
 } 
@@ -55,14 +52,6 @@ class UserAccess extends Component{
 		);
 	}
 } 
-/*
 
-cc
-				<Tab.Navigator>
-					<Tab.Screen name="Profile" component={Profile} />
-					<Tab.Screen name="Friends" component={Friends} />
-				</Tab.Navigator>
-
-*/
 
 export default UserAccess;

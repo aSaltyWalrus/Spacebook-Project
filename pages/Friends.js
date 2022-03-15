@@ -4,209 +4,207 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 class Friends extends Component{
-  constructor(props){
-    super(props);
-
-    this.state = {
-      sessionToken: "",
-      isLoading: true,
-      isUsersFriends: false,
-      friendsData: "",
-      friendRequestsData: "",
-      profileID: 0,
-      searchField: "",
-      hasSearched: false,
-      searchData: "",
-      sessionUserID: 0
+    constructor(props){
+        super(props);
+        this.state = {
+            sessionToken: "",
+            isLoading: true,
+            isUsersFriends: false,
+            friendsData: "",
+            friendRequestsData: "",
+            profileID: 0,
+            searchField: "",
+            hasSearched: false,
+            searchData: "",
+            sessionUserID: 0
+        }
     }
-  }
 
-  componentDidMount() {
-    this.unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.getFriendsData();
-    }); 
-  }
-
-
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-
-  getFriendsData = async () => {
-    const token = await AsyncStorage.getItem('@session_token');
-    const userID = await AsyncStorage.getItem('@id');
-    if(this.props.route.params != null){
-      this.setState({
-        profileID: this.props.route.params.id,
-        sessionToken: token,
-        sessionUserID: userID,
-      })
+    componentDidMount() {
+        this.unsubscribe = this.props.navigation.addListener('focus', () => {
+            this.getFriendsData();
+        }); 
     }
-    else{
-      this.setState({
-        profileID: userID,
-        sessionToken: token,
-        sessionUserID: userID,
-      })
+
+
+    componentWillUnmount() {
+        this.unsubscribe();
     }
-    if (this.profileID == userID){
-      this.setState({
-        isUsersFriends: true,
-      })
+
+    getFriendsData = async () => {
+        const token = await AsyncStorage.getItem('@session_token');
+        const userID = await AsyncStorage.getItem('@id');
+
+        if (this.props.route.params != null) {
+            this.setState({
+                profileID: this.props.route.params.id,
+                sessionToken: token,
+                sessionUserID: userID,
+            })
+        } else {
+            this.setState({
+                profileID: userID,
+                sessionToken: token,
+                sessionUserID: userID,
+            })
+        }
+        if (this.profileID == userID){
+            this.setState({
+                isUsersFriends: true,
+            })
+        }
+
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/friends", {
+            'headers': {
+                'X-Authorization':  token
+            }
+        })
+
+        .then((response) => {
+            if (response.status === 200) {
+                return response.json()
+            } else if (response.status === 401) {
+                this.props.navigation.navigate("Login");
+            } else if (response.status === 403) {
+                console.log("can only view the friends of yourself or your friends");
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+
+        .then((responseJson) => {
+            this.setState({  
+                friendsData: responseJson,
+            })
+            this.getFriendRequests(); // after the friend data is loaded, load the friend request data
+        })
+
+        .catch((error) => {
+            console.log(error);
+        })
     }
-    return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/friends", {
-      'headers': {
-        'X-Authorization':  token
-      }
-    })
-    .then((response) => {
-      if(response.status === 200){
-        return response.json()
-      }
-      else if(response.status === 401){
-        this.props.navigation.navigate("Login");
-      }
-      else if(response.status === 403){
-        console.log("can only view the friends of yourself or your friends");
-      }
-      else{
-        throw 'Error: check server response';
-      }
-    })
-    .then((responseJson) => {
-      this.setState({  
-        friendsData: responseJson,
-      })
-      this.getFriendRequests(); // after the friend data is loaded, load the friend request data
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-  }
 
 
-  searchUsers() {
-    return fetch("http://localhost:3333/api/1.0.0/search/?q=" + this.state.searchField, {
-      method: "get",
-      headers: {
-        'X-Authorization':  this.state.sessionToken
-      },
-    })
-    .then((response) => {
-      if(response.status === 200){
-        return response.json()
-      }
-      else if(response.status === 401){
-        throw 'Error: not authorized';
-      }
-      else{
-        throw 'Error: check server response';
-      }
-    })
-    .then((responseJson) => {
-      this.setState({
-        searchData: responseJson,
-      })
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-  }
+    searchUsers() {
+        return fetch("http://localhost:3333/api/1.0.0/search/?q=" + this.state.searchField, {
+            method: "get",
+            headers: {
+                'X-Authorization':  this.state.sessionToken
+            },
+        })
 
-  getFriendRequests() {
-    return fetch("http://localhost:3333/api/1.0.0/friendrequests", {
-      'headers': {
-        'X-Authorization':  this.state.sessionToken
-      }
-    })
-    .then((response) => {
-      if(response.status === 200){
-        return response.json()
-      }
-      else if(response.status === 401){
-        throw 'Error: not authorized';
-      }
-      else{
-        throw 'Error: check server response';
-      }
-    })
-    .then((responseJson) => {
-      this.setState({  
-        isLoading: false,
-        friendRequestsData: responseJson,
-      })
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-  }
+        .then((response) => {
+            if (response.status === 200) {
+                return response.json()
+            } else if (response.status === 401) {
+                throw 'Error: not authorized';
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+
+        .then((responseJson) => {
+            this.setState({
+                searchData: responseJson,
+            })
+        })
+
+        .catch((error) => {
+            console.log(error);
+        })
+    }
+
+    getFriendRequests() {
+        return fetch("http://localhost:3333/api/1.0.0/friendrequests", {
+            'headers': {
+                'X-Authorization':  this.state.sessionToken
+            }
+        })
+
+        .then((response) => {
+            if (response.status === 200) {
+                return response.json()
+            } else if (response.status === 401) {
+                throw 'Error: not authorized';
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+
+        .then((responseJson) => {
+            this.setState({  
+                isLoading: false,
+                friendRequestsData: responseJson,
+            })
+        })
+
+        .catch((error) => {
+            console.log(error);
+        })
+    }
 
 
-  sendFriendRequest(theirID)  {
-    return fetch("http://localhost:3333/api/1.0.0/user/" + theirID + "/friends", {
-      method: "post",
-      headers: {
-        'X-Authorization':  this.state.sessionToken
-      },
-    })
-    .then((response) => {
-      if(response.status === 200){
-        throw 'success';
-      }
-      else if(response.status === 401){
-        throw 'Error: not authorized';
-      }
-      else if(response.status === 403){
-        throw 'Error: already sent request';
-      }
-      else{
-        throw 'Error: check server response';
-      }
-    })
-  }
+    sendFriendRequest(theirID)  {
+        return fetch("http://localhost:3333/api/1.0.0/user/" + theirID + "/friends", {
+            method: "post",
+            headers: {
+                'X-Authorization':  this.state.sessionToken
+            },
+        })
 
-  acceptFriendRequest(theirID)  {
-    return fetch("http://localhost:3333/api/1.0.0/friendrequests/" + theirID, {
-      method: "post",
-      headers: {
-        'X-Authorization':  this.state.sessionToken
-      },
-    })
-    .then((response) => {
-      if(response.status === 200){
-        this.getFriendsData(); // reload friends
-        this.getFriendRequests(); // reload requests
-        throw 'success';
-      }
-      else if(response.status === 401){
-        throw 'Error: not authorized';
-      }
-      else{
-        throw 'Error: check server response';
-      }
-    })
-  }
+        .then((response) => {
+            if (response.status === 200) {
+                throw 'success';
+            } else if (response.status === 401) {
+                throw 'Error: not authorized';
+            } else if (response.status === 403) {
+                throw 'Error: already sent request';
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+    }
 
-  rejectFriendRequest(theirID)  {
-    return fetch("http://localhost:3333/api/1.0.0/friendrequests/" + theirID, {
-      method: "delete",
-      headers: {
-        'X-Authorization':  this.state.sessionToken
-      },
-    })
-    .then((response) => {
-      if(response.status === 200){
-        this.getFriendRequests(); // reload requests
-        throw 'success';
-      }
-      else if(response.status === 401){
-        throw 'Error: not authorized';
-      }
-      else{
-        throw 'Error: check server response';
-      }
-    })
-  }
+    acceptFriendRequest(theirID)  {
+        return fetch("http://localhost:3333/api/1.0.0/friendrequests/" + theirID, {
+            method: "post",
+            headers: {
+                'X-Authorization':  this.state.sessionToken
+            },
+        })
+
+        .then((response) => {
+            if (response.status === 200) {
+                this.getFriendsData(); // reload friends
+                this.getFriendRequests(); // reload requests
+                throw 'success';
+            } else if (response.status === 401) {
+                throw 'Error: not authorized';
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+    }
+
+    rejectFriendRequest(theirID)  {
+        return fetch("http://localhost:3333/api/1.0.0/friendrequests/" + theirID, {
+            method: "delete",
+            headers: {
+                'X-Authorization':  this.state.sessionToken
+            },
+        })
+
+        .then((response) => {
+            if (response.status === 200) {
+                this.getFriendRequests(); // reload requests
+                throw 'success';
+            } else if (response.status === 401) {
+                throw 'Error: not authorized';
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+    }
 
   render(){
     if (this.state.isLoading) {
@@ -221,8 +219,7 @@ class Friends extends Component{
           <Text>Loading..</Text>
         </View>
       );
-    }
-    else {
+    } else {
       return (
         <View>
           <View>

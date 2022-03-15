@@ -4,114 +4,116 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class Profile extends Component{
 
-  constructor(props){
-    super(props);
-    this.state = {
-        isLoading: true,
-        profileData: [],
-        profileID: 0,
-        isUsersProfile: false
-    };
-  }
+    constructor(props){
+        super(props);
+        this.state = {
+            isLoading: true,
+             profileData: [],
+            profileID: 0,
+            isUsersProfile: false
+        };
+    }
 
     componentDidMount() {
-      this.unsubscribe = this.props.navigation.addListener('focus', () => {
-        this.checkLoggedIn();
-        this.getProfileData();
-      }); 
+        this.unsubscribe = this.props.navigation.addListener('focus', () => {
+            this.checkLoggedIn();
+            this.getProfileData();
+        }); 
     }
 
 
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-
-
-  getProfileData = async () => {
-    const token = await AsyncStorage.getItem('@session_token');
-    const userID = await AsyncStorage.getItem('@id');
-    console.log(this.props.route.params)
-    if(this.props.route.params != null){
-      this.setState({
-        profileID: this.props.route.params.id,
-        sessionToken: token
-      })
+    componentWillUnmount() {
+        this.unsubscribe();
     }
-    else{
-      this.setState({
-        profileID: userID,
-        sessionToken: token,
-      })
+
+
+    getProfileData = async () => {
+        const token = await AsyncStorage.getItem('@session_token');
+        const userID = await AsyncStorage.getItem('@id');
+
+        if (this.props.route.params != null) {
+            this.setState({
+                profileID: this.props.route.params.id,
+                sessionToken: token
+            })
+        } else {
+            this.setState({
+                profileID: userID,
+                sessionToken: token,
+            })
+        } 
+        if (this.state.profileID == userID) {
+            this.setState({
+                isUsersProfile: true
+            })
+        }
+
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
+            'headers': {
+                'X-Authorization':  token
+            }
+        })
+
+        .then((response) => {
+            if (response.status === 200) {
+                return response.json()
+            } else if (response.status === 401) {
+                this.props.navigation.navigate("Login");
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+
+        .then((responseJson) => {
+            this.setState({  
+                isLoading: false,
+                profileData: [responseJson],
+            })
+        })
+
+        .catch((error) => {
+            console.log(error);
+        })
     }
-    if(this.state.profileID == userID){
-      this.setState({
-        isUsersProfile: true
-      })
+
+    getProfilePosts = async () => {
+        const token = await AsyncStorage.getItem('@session_token');
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
+            'headers': {
+                'X-Authorization':  token
+            }
+        })
+
+        .then((response) => {
+            if (response.status === 200) {
+                return response.json()
+            } else if (response.status === 401) {
+                this.props.navigation.navigate("Login");
+            } else {
+                throw 'Error: check server response';
+            }
+        })
+
+        .then((responseJson) => {
+            this.setState({  
+                isLoading: false,
+                profileData: [responseJson],
+            })
+        })
+
+        .catch((error) => {
+            console.log(error);
+        })
     }
-    return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
-      'headers': {
-        'X-Authorization':  token
-      }
-    })
-    .then((response) => {
-      if(response.status === 200){
-        return response.json()
-      }
-      else if(response.status === 401){
-        this.props.navigation.navigate("Login");
-      }
-      else{
-        throw 'Error: check server response';
-      }
-    })
-    .then((responseJson) => {
-      this.setState({  
-        isLoading: false,
-        profileData: [responseJson],
-      })
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-  }
-
-  getProfilePosts = async () => {
-    const token = await AsyncStorage.getItem('@session_token');
-    return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
-      'headers': {
-        'X-Authorization':  token
-      }
-    })
-    .then((response) => {
-      if(response.status === 200){
-        return response.json()
-      }
-      else if(response.status === 401){
-        this.props.navigation.navigate("Login");
-      }
-      else{
-        throw 'Error: check server response';
-      }
-    })
-    .then((responseJson) => {
-      this.setState({  
-        isLoading: false,
-        profileData: [responseJson],
-      })
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-  }
 
 
 
-  checkLoggedIn = async () => {
-    const token = await AsyncStorage.getItem('@session_token');
-    if (token == null) {
-      this.props.navigation.navigate('Login');
-    }
-  };
+    checkLoggedIn = async () => {
+        const token = await AsyncStorage.getItem('@session_token');
+        if (token == null) {
+            this.props.navigation.navigate('Login');
+        }
+    };
 
 
   render(){
@@ -127,8 +129,7 @@ class Profile extends Component{
           <Text>Loading..</Text>
         </View>
       );
-    }
-    else {
+    } else {
       return (
         <View>
           <View>

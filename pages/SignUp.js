@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, TextInput, Button, ActivityIndicator, Alert } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class SignUp extends Component{
@@ -10,7 +10,7 @@ class SignUp extends Component{
         this.state = {
             isLoading: true,
             email: "",
-            password: "",
+            password: "", 
             firstName: "",
             secondName: "",
             id: ""
@@ -75,9 +75,9 @@ class SignUp extends Component{
         })
         
        .then(async (responseJson) => {
-            console.log(responseJson);
             await AsyncStorage.setItem('@session_token', responseJson.token);
-            this.props.navigation.navigate("Profile", {id:responseJson.id});
+            await AsyncStorage.setItem('@id', responseJson.id);
+            this.props.navigation.navigate("App");
         })
 
        .catch((error) => {
@@ -92,62 +92,65 @@ class SignUp extends Component{
       return (
         <ScrollView>
         <View style={styles.screen}>
-            <View style={styles.container}>
-                <Text style={styles.formTitles}>SPACEBOOK</Text>
-            </View>
+          <View style={styles.container}>
+            <Text style={styles.formTitles}>SPACEBOOK</Text>
+          </View>
 
-            <View style={styles.container}>
-                <Text style={styles.formTitles}>forename</Text>
-                <TextInput
-                    style={styles.formInputs}
-                    onChangeText={(firstName) => this.setState({firstName})}
-                    value={this.state.firstName}
-                />
-            </View>
+          <View style={styles.container}>
+            <Text style={styles.formTitles}>forename</Text>
+            <TextInput
+              style={styles.formInputs}
+              onChangeText={(firstName) => this.setState({firstName})}
+              value={this.state.firstName}
+            />
+          </View>
 
-            <View style={styles.container}>
-                <Text style={styles.formTitles}>surname</Text>
-                <TextInput
-                    style={styles.formInputs}
-                    onChangeText={(secondName) => this.setState({secondName})}
-                    value={this.state.secondName}
-                />
-            </View>
+          <View style={styles.container}>
+            <Text style={styles.formTitles}>surname</Text>
+            <TextInput
+              style={styles.formInputs}
+              onChangeText={(secondName) => this.setState({secondName})}
+              value={this.state.secondName}
+            />
+          </View>
 
-            <View style={styles.container}>
-                <Text style={styles.formTitles}>email</Text>
-                <TextInput
-                    style={styles.formInputs}
-                    onChangeText={(email) => this.setState({email})}
-                    value={this.state.email}
-                />
-            </View>
+          <View style={styles.container}>
+            <Text style={styles.formTitles}>email</Text>
+              <TextInput
+                style={styles.formInputs}
+                onChangeText={(email) => this.setState({email})}
+                value={this.state.email}
+            />
+          </View>
 
-            <View style={styles.container}>
-                <Text style={styles.formTitles}>password</Text>
-                <TextInput
-                    style={styles.formInputs}
-                    onChangeText={(password) => this.setState({password})}
-                    value={this.state.password}
-                />
-            </View>
+          <View style={styles.container}>
+            <Text style={styles.formTitles}>password</Text>
+            <TextInput
+              style={styles.formInputs}
+              onChangeText={(password) => this.setState({password})}
+              value={this.state.password}
+            />
+          </View>
 
-            <View style={styles.container}>
-                <Button
-                    onPress={() => this.createUser()}
-                    title="Create Account"
-                />
-            </View>
+          <View style={styles.buttonContainer}>
+            <Button
+              onPress={() => this.props.navigation.popToTop()}
+              title="Back To Login"
+            />
+            <Button
+              onPress={() => this.createUser()}
+              title="Create Account"
+            />
+          </View>
             
-            <StatusBar style="auto" />
+          <StatusBar style="auto" />
+
         </View>
         </ScrollView>
 
       );
     }
 }
-
-// onPress={ () => navigation.navigate("Profile") }
 
 const styles = StyleSheet.create({
   screen: {
@@ -162,6 +165,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff7700',
     alignItems: 'center',
     justifyContent: 'space-evenly',
+    borderWidth: 1,
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#ff7700',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
   },
   formTitles: {
