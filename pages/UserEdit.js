@@ -101,6 +101,28 @@ class UserEdit extends Component{
         })
     }
 
+    logout() {
+        return fetch("http://localhost:3333/api/1.0.0/logout", {
+            method: "post",
+            headers: {
+                'X-Authorization':  this.state.sessionToken,
+            },
+        })
+        
+       .then((response) => {
+            if (response.status === 200){
+                this.props.navigation.navigate("Login");
+            } else if (response.status === 401){
+                throw 'Error: not authorised';
+            } else {
+                throw 'unknown error';
+            }
+        })
+
+       .catch((error) => {
+            console.log(error);
+       })
+    }
 
     render(){
 

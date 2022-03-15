@@ -17,13 +17,11 @@ const Tab = createBottomTabNavigator();
 class App extends Component{
 	render(){
 		return (
-			<NavigationContainer independent={true}>
-				<Tab.Navigator  screenOptions={{headerShown: false}}>
-					<Tab.Screen name="Profile" component={Profile} />
-					<Tab.Screen name="User Edit" component={UserEdit} />
-					<Tab.Screen name="User Explorer" component={BrowseUsers} />
-				</Tab.Navigator>
-			</NavigationContainer>
+			<Tab.Navigator  screenOptions={{headerShown: false}}>
+				<Tab.Screen name="Profile" component={Profile} />
+				<Tab.Screen name="User Edit" component={UserEdit} />
+				<Tab.Screen name="User Explorer" component={BrowseUsers} />
+			</Tab.Navigator>
 		);
 	}
 }
@@ -52,6 +50,5 @@ class UserAccess extends Component{
 		);
 	}
 } 
-
 
 export default UserAccess;
