@@ -12,6 +12,7 @@ class Profile extends Component{
             profileID: 0,
             isUsersProfile: false,
             profilePostsData: "",
+            newPostText: "",
         };
     }
 
@@ -26,6 +27,14 @@ class Profile extends Component{
     componentWillUnmount() {
         this.unsubscribe();
     }
+
+
+    checkLoggedIn = async () => {
+        const token = await AsyncStorage.getItem('@session_token');
+        if (token == null) {
+            this.props.navigation.navigate('Login');
+        }
+    };
 
 
     getProfileData = async () => {
@@ -77,6 +86,7 @@ class Profile extends Component{
         })
     }
 
+
     getProfilePosts() {
         return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/post", {
             'headers': {
@@ -107,13 +117,35 @@ class Profile extends Component{
     }
 
 
+    createNewPost() {
+        let to_send = {
+            text: this.state.newPostText,
+        };
 
-    checkLoggedIn = async () => {
-        const token = await AsyncStorage.getItem('@session_token');
-        if (token == null) {
-            this.props.navigation.navigate('Login');
-        }
-    };
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/post", {
+            method: "post",
+            headers: {
+                'X-Authorization':  this.state.sessionToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(to_send)
+        })
+
+        .then((response) => {
+            if(response.status === 201){
+                this.setState({ newPostText: "" }) // reset the post text
+                this.getProfilePosts() // reload profile posts
+            }else if(response.status === 401){
+                throw 'Error: not authorised';
+            }else{
+                throw 'unknown error';
+            }
+        })
+       
+        .catch((error) => {
+            console.log(error);
+        })
+    }
 
 
   render(){
@@ -153,17 +185,32 @@ class Profile extends Component{
               <Text> This is you [discover others button] </Text>
             }
 
-            <Text>Posts</Text>
-            <FlatList
-              data={this.state.profilePostsData}
-              renderItem={({item}) => ( 
-                <View>
-                  <Text>{item.text}</Text>
-                  <Text>Likes: {item.numLikes}</Text>
-                </View>
-              )}
-              keyExtractor={(item, index) => item.post_id}
-            />
+            <View>
+              <Text>Create New Post</Text>
+              <TextInput
+                style={styles.formInputs}
+                onChangeText={(newPostText) => this.setState({newPostText})}
+                value={this.state.newPostText}
+              />
+              <Button
+                onPress={() => this.createNewPost()}
+                title="Post"
+              />
+            </View>
+
+            <View>
+              <Text>Posts</Text>
+              <FlatList
+                data={this.state.profilePostsData}
+                renderItem={({item}) => ( 
+                  <View>
+                    <Text>{item.text}</Text>
+                    <Text>Likes: {item.numLikes}</Text>
+                  </View>
+                )}
+                keyExtractor={(item, index) => item.post_id}
+              />
+            </View>
           </View>
         </View>
       );
