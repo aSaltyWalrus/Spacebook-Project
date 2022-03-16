@@ -19,11 +19,13 @@ class UserEdit extends Component{
         }
     }
 
+
     componentDidMount() {
         this.unsubscribe = this.props.navigation.addListener('focus', () => {
             this.getProfileData();
         }); 
     }
+
 
     getProfileData = async () => {
         const token = await AsyncStorage.getItem('@session_token');
@@ -61,6 +63,7 @@ class UserEdit extends Component{
             console.log(error);
         })
     }
+
 
     editUser() {
         let to_send = {};
@@ -101,6 +104,7 @@ class UserEdit extends Component{
         })
     }
 
+
     logout() {
         return fetch("http://localhost:3333/api/1.0.0/logout", {
             method: "post",
@@ -123,6 +127,7 @@ class UserEdit extends Component{
             console.log(error);
        })
     }
+
 
     render(){
 

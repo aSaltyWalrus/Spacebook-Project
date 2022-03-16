@@ -20,6 +20,7 @@ class Friends extends Component{
         }
     }
 
+
     componentDidMount() {
         this.unsubscribe = this.props.navigation.addListener('focus', () => {
             this.getFriendsData();
@@ -30,6 +31,7 @@ class Friends extends Component{
     componentWillUnmount() {
         this.unsubscribe();
     }
+
 
     getFriendsData = async () => {
         const token = await AsyncStorage.getItem('@session_token');
@@ -114,6 +116,7 @@ class Friends extends Component{
         })
     }
 
+
     getFriendRequests() {
         return fetch("http://localhost:3333/api/1.0.0/friendrequests", {
             'headers': {
@@ -165,6 +168,7 @@ class Friends extends Component{
         })
     }
 
+
     acceptFriendRequest(theirID)  {
         return fetch("http://localhost:3333/api/1.0.0/friendrequests/" + theirID, {
             method: "post",
@@ -186,6 +190,7 @@ class Friends extends Component{
         })
     }
 
+
     rejectFriendRequest(theirID)  {
         return fetch("http://localhost:3333/api/1.0.0/friendrequests/" + theirID, {
             method: "delete",
@@ -205,6 +210,7 @@ class Friends extends Component{
             }
         })
     }
+
 
   render(){
     if (this.state.isLoading) {
@@ -324,7 +330,6 @@ class Friends extends Component{
     }    
   }
 }
-
 
   
 const styles = StyleSheet.create({

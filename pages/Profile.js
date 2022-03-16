@@ -18,6 +18,7 @@ class Profile extends Component{
         };
     }
 
+
     componentDidMount() {
         this.unsubscribe = this.props.navigation.addListener('focus', () => {
             this.checkLoggedIn();
@@ -151,6 +152,7 @@ class Profile extends Component{
         })
     }
 
+
     deletePost(post_id) {
         return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/post/" + post_id, {
             method: "delete",
@@ -175,6 +177,7 @@ class Profile extends Component{
             console.log(error);
         })
     }
+
 
     likePost(post_id) {
         return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/post/" + post_id + "/like", {

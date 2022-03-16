@@ -17,6 +17,7 @@ class SignUp extends Component{
         }
     }
 
+
     createUser = () => {
         console.log("creating user...");
         let to_send = {
@@ -48,6 +49,7 @@ class SignUp extends Component{
             console.log(error);
         })
     }
+
 
     signIn = () => {
         console.log("signing in...");
@@ -84,6 +86,7 @@ class SignUp extends Component{
             console.log(error);
        })
     }
+
 
     render(){
 
@@ -151,6 +154,7 @@ class SignUp extends Component{
       );
     }
 }
+
 
 const styles = StyleSheet.create({
   screen: {

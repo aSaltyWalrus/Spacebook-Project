@@ -51,6 +51,7 @@ class Login extends Component{
        })
     }
 
+
     render(){
 
       const navigation = this.props.navigation;
@@ -100,6 +101,7 @@ class Login extends Component{
       );
     }
 }
+
 
 const styles = StyleSheet.create({
   screen: {
