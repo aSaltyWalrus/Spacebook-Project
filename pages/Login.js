@@ -57,11 +57,12 @@ class Login extends Component{
       const navigation = this.props.navigation;
 
       return (
-        <ScrollView>
-          <View style={styles.screen}>
+      <View style={styles.screen}>
+          <View style={styles.banner}></View>
+          <View style={styles.mainContainer}>
 
             <View style={styles.container}>
-              <Text style={styles.formTitles}>SPACEBOOK</Text>
+              <Text style={styles.mainTitle}>SPACEBOOK</Text>
             </View>
 
             <View style={styles.container}>
@@ -84,10 +85,12 @@ class Login extends Component{
 
             <View style={styles.buttonContainer}> 
                 <Button
+                    color={'#5643fd'}
                     onPress={ () => navigation.navigate("SignUp") }
                     title="Sign Up"
                 />
                 <Button
+                    color={'#5643fd'}
                     onPress={() => this.signIn()}
                     title="Login"
                 />
@@ -96,8 +99,8 @@ class Login extends Component{
             <StatusBar style="auto" />
 
           </View>
-        </ScrollView>
-
+          <View style={styles.banner}></View>
+        </View>
       );
     }
 }
@@ -107,29 +110,40 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     flexDirection: 'column',
-    alignItems: 'stretch',
-    justifyContent: 'center',
-    backgroundColor: '#fff000',
+    alignContent: 'center',
+    backgroundColor: '#0c164f',
   },
-  container: {
+  mainContainer: {
     flex: 1,
-    backgroundColor: '#ff7700',
+    justifyContent: 'flex-start',
+  },
+  banner: {
+        flex: 1
+  },
+    container: {
+    flex: 2,
     alignItems: 'center',
-    justifyContent: 'space-evenly',
-    borderWidth: 1,
   },
   buttonContainer: {
-    flex: 1,
+    flex: 2,
+    alignSelf: 'center',
+    padding: '5%',
     flexDirection: 'row',
-    backgroundColor: '#ff7700',
-    alignItems: 'center',
-    justifyContent: 'center',
     borderWidth: 1,
+  },
+  mainTitle: {
+    flex: 16,
+    fontFamily: 'Roboto',
+    fontSize: '100%',
+    color: '#ffffff',
+    alignSelf: 'center',
   },
   formTitles: {
     flex: 1,
     fontFamily: 'Roboto',
-    fontSize: '100%'
+    fontSize: '100%',
+    color: '#ffffff',
+    alignSelf: 'center',
   },
   formInputs: {
     flex: 1,
@@ -137,6 +151,7 @@ const styles = StyleSheet.create({
     margin: '0.5%',
     borderWidth: 1,
     padding: '0.5%',
+    backgroundColor: '#ffffff',
   },
 })
 

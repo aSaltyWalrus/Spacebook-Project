@@ -93,63 +93,63 @@ class SignUp extends Component{
       const navigation = this.props.navigation;
 
       return (
-        <ScrollView>
+        
         <View style={styles.screen}>
-          <View style={styles.container}>
-            <Text style={styles.formTitles}>SPACEBOOK</Text>
-          </View>
+          <View style={styles.banner}></View>
+          <View style={styles.mainContainer}>
+              <View style={styles.container}>
+                <Text style={styles.formTitles}>SPACEBOOK</Text>
+              </View>
 
-          <View style={styles.container}>
-            <Text style={styles.formTitles}>forename</Text>
-            <TextInput
-              style={styles.formInputs}
-              onChangeText={(firstName) => this.setState({firstName})}
-              value={this.state.firstName}
-            />
-          </View>
+              <View style={styles.container}>
+                <Text style={styles.formTitles}>forename</Text>
+                <TextInput
+                  style={styles.formInputs}
+                  onChangeText={(firstName) => this.setState({firstName})}
+                  value={this.state.firstName}
+                />
+              </View>
 
-          <View style={styles.container}>
-            <Text style={styles.formTitles}>surname</Text>
-            <TextInput
-              style={styles.formInputs}
-              onChangeText={(secondName) => this.setState({secondName})}
-              value={this.state.secondName}
-            />
-          </View>
+              <View style={styles.container}>
+                <Text style={styles.formTitles}>surname</Text>
+                <TextInput
+                  style={styles.formInputs}
+                  onChangeText={(secondName) => this.setState({secondName})}
+                  value={this.state.secondName}
+                />
+              </View>
 
-          <View style={styles.container}>
-            <Text style={styles.formTitles}>email</Text>
-              <TextInput
-                style={styles.formInputs}
-                onChangeText={(email) => this.setState({email})}
-                value={this.state.email}
-            />
-          </View>
+              <View style={styles.container}>
+                <Text style={styles.formTitles}>email</Text>
+                  <TextInput
+                    style={styles.formInputs}
+                    onChangeText={(email) => this.setState({email})}
+                    value={this.state.email}
+                />
+              </View>
 
-          <View style={styles.container}>
-            <Text style={styles.formTitles}>password</Text>
-            <TextInput
-              style={styles.formInputs}
-              onChangeText={(password) => this.setState({password})}
-              value={this.state.password}
-            />
-          </View>
+              <View style={styles.container}>
+                <Text style={styles.formTitles}>password</Text>
+                <TextInput
+                  style={styles.formInputs}
+                  onChangeText={(password) => this.setState({password})}
+                  value={this.state.password}
+                />
+              </View>
 
-          <View style={styles.buttonContainer}>
-            <Button
-              onPress={() => this.props.navigation.popToTop()}
-              title="Back To Login"
-            />
-            <Button
-              onPress={() => this.createUser()}
-              title="Create Account"
-            />
+              <View style={styles.buttonContainer}>
+                <Button
+                  onPress={() => this.props.navigation.popToTop()}
+                  title="Back To Login"
+                />
+                <Button
+                  onPress={() => this.createUser()}
+                  title="Create Account"
+                />
+              </View>
           </View>
-            
-          <StatusBar style="auto" />
-
+          <View style={styles.banner}></View>
         </View>
-        </ScrollView>
 
       );
     }
@@ -160,29 +160,40 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     flexDirection: 'column',
-    alignItems: 'stretch',
-    justifyContent: 'center',
-    backgroundColor: '#fff000',
+    alignContent: 'center',
+    backgroundColor: '#0c164f',
   },
-  container: {
-    flex: 1,
-    backgroundColor: '#ff7700',
+  mainContainer: {
+    flex: 2,
+    justifyContent: 'flex-start',
+  },
+  banner: {
+        flex: 1
+  },
+    container: {
+    flex: 2,
     alignItems: 'center',
-    justifyContent: 'space-evenly',
-    borderWidth: 1,
   },
   buttonContainer: {
-    flex: 1,
+    flex: 2,
+    alignSelf: 'center',
+    padding: '5%',
     flexDirection: 'row',
-    backgroundColor: '#ff7700',
-    alignItems: 'center',
-    justifyContent: 'center',
     borderWidth: 1,
+  },
+  mainTitle: {
+    flex: 16,
+    fontFamily: 'Roboto',
+    fontSize: '100%',
+    color: '#ffffff',
+    alignSelf: 'center',
   },
   formTitles: {
     flex: 1,
     fontFamily: 'Roboto',
-    fontSize: '100%'
+    fontSize: '100%',
+    color: '#ffffff',
+    alignSelf: 'center',
   },
   formInputs: {
     flex: 1,
@@ -190,6 +201,7 @@ const styles = StyleSheet.create({
     margin: '0.5%',
     borderWidth: 1,
     padding: '0.5%',
+    backgroundColor: '#ffffff',
   },
 })
 

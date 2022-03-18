@@ -189,6 +189,12 @@ class UserEdit extends Component{
                     title="Logout"
                 />
             </View>
+            <View style={styles.container}>
+                <Button
+                    onPress={() => this.props.navigation.navigate('Camera Page')}
+                    title="Logout"
+                />
+            </View>
             
             <StatusBar style="auto" />
         </View>

@@ -10,6 +10,7 @@ import SignUp from './pages/SignUp';
 import Profile from './pages/Profile';
 import Friends from './pages/Friends';
 import UserEdit from './pages/UserEdit';
+import CameraPage from './pages/CameraPage';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -20,6 +21,7 @@ class App extends Component{
 			<Tab.Navigator  screenOptions={{headerShown: false}}>
 				<Tab.Screen name="Profile" component={Profile} />
 				<Tab.Screen name="User Edit" component={UserEdit} />
+				<Tab.Screen name="Camera Page" component={CameraPage} />
 				<Tab.Screen name="User Explorer" component={BrowseUsers} />
 			</Tab.Navigator>
 		);
