@@ -20,8 +20,8 @@ class App extends Component{
 		return (
 			<Tab.Navigator  screenOptions={{headerShown: false}}>
 				<Tab.Screen name="Profile" component={Profile} />
-				<Tab.Screen name="User Edit" component={UserEdit} />
-				<Tab.Screen name="Camera Page" component={CameraPage} />
+				<Tab.Screen name="Edit Profile" component={UserEdit} />
+				<Tab.Screen name="Camera" component={CameraPage} />
 				<Tab.Screen name="User Explorer" component={BrowseUsers} />
 			</Tab.Navigator>
 		);
@@ -33,7 +33,7 @@ class BrowseUsers extends Component{
 		return (
 			<Stack.Navigator>
 				<Stack.Screen name="Friends" component={Friends} />
-				<Stack.Screen name="Other Profile" component={Profile} />
+				<Stack.Screen name="Profile" component={Profile} />
 			</Stack.Navigator>
 		);
 	}

@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TextInput, ActivityIndicator, FlatList, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, ActivityIndicator, FlatList, Button, Image, TouchableOpacity, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class Profile extends Component{
@@ -13,6 +13,7 @@ class Profile extends Component{
             profileData: [],
             profileID: 0,
             isUsersProfile: false,
+            profilePhoto: "",
             profilePostsData: "",
             newPostText: "",
         };
@@ -83,12 +84,57 @@ class Profile extends Component{
             this.setState({  
                 profileData: [responseJson],
             })
-            this.getProfilePosts(); // after the personal data is loaded, load the posts data
+            this.getProfilePicture(); // after the personal data is loaded, load the profile picture
         })
 
         .catch((error) => {
             console.log(error);
         })
+    }
+
+    getProfilePicture() {
+        return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/photo", {
+            'headers': {
+                'X-Authorization':  this.state.sessionToken
+            }
+        })
+
+        .then((res) => {
+            return res.blob();
+        })
+        .then((resBlob) => {
+            let data = URL.createObjectURL(resBlob);
+            this.setState({
+                profilePhoto: data,
+                
+            });
+            this.getProfilePosts(); // after the profile picture is loaded, load the posts data
+        })
+        .catch((err) => {
+            console.log("error", err)
+        });
+    }
+
+    getUserPicture(user_id) {
+        return fetch("http://localhost:3333/api/1.0.0/user/" + user_id + "/photo", {
+            'headers': {
+                'X-Authorization':  this.state.sessionToken
+            }
+        })
+
+        .then((res) => {
+            return res.blob();
+        })
+
+        .then((resBlob) => {
+            let data = URL.createObjectURL(resBlob);
+            return data;
+        })
+
+        .catch((err) => {
+            console.log("error", err)
+        });
+
     }
 
 
@@ -111,9 +157,10 @@ class Profile extends Component{
 
         .then((responseJson) => {
             this.setState({  
-                isLoading: false,
                 profilePostsData: responseJson,
+                isLoading: false,
             })
+            
         })
 
         .catch((error) => {
@@ -246,68 +293,110 @@ class Profile extends Component{
       );
     } else {
       return (
-        <View>
-          <View>
+      <ScrollView>
+        <View style={{backgroundColor:'#0c164f'}}>
+        
+          <View style={{padding: 10}}>
+            <View style={{flexDirection:'row'}}>
+            <Image
+              source={{
+                uri: this.state.photo,
+              }}
+              style={{
+                width: 100,
+                height: 100,
+                borderWidth: 1 
+              }}
+            />
             <FlatList
+              style={{padding: 5}}
               data={this.state.profileData}
               renderItem={({item}) => ( 
                 <View>
-                  <Text>{item.first_name} {item.last_name}</Text>
-                  <Text>Email: {item.email}</Text>
+                  <Text style={styles.buttonText}>{item.first_name} {item.last_name}</Text>
+                  <Text style={styles.text}>email: {item.email}</Text>
                 </View>
               )}
               keyExtractor={(item, index) => item.user_id.toString()}
             />
-
+            </View>
             {!this.state.isUsersProfile ?
               <Button
                 onPress={() => this.props.navigation.push("Friends", {id:this.state.profileID})}
                 title="Friends"
               />
               :
-              <Text> This is you [discover others button] </Text>
+              <Text style={styles.text}> This is you </Text>
             }
-
+            <View style={styles.seperator}></View>
             <View>
-              <Text>Create New Post</Text>
+              <Text style={styles.sectionHeaderText}>Create New Post</Text>
               <TextInput
                 style={styles.formInputs}
                 onChangeText={(newPostText) => this.setState({newPostText})}
                 value={this.state.newPostText}
               />
-              <Button
-                onPress={() => this.createNewPost()}
-                title="Post"
-              />
+              
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => { this.createNewPost(); }}
+              >
+                <Text style={styles.buttonText}>POST</Text>
+              </TouchableOpacity>
             </View>
-
+            <View style={styles.seperator}></View>
             <View>
-              <Text>Posts</Text>
+              <Text style={styles.sectionHeaderText}>Posts</Text>
               <FlatList
                 data={this.state.profilePostsData}
                 renderItem={({item}) => ( 
-                  <View>
-                    <Text>{item.author.first_name} {item.author.last_name}</Text>
-                    <Text>{item.text}</Text>
-                    <Text>Likes: {item.numLikes}</Text>
-                    
+                  <View style={{borderRadius:5 , padding: 5, backgroundColor: '#0c165f', marginVertical:10}}>
+                    <View style={{flexDirection:'row'}}>
+                      <Image
+                        source={{
+                          uri: this.getUserPicture(item.author.user_id)
+                        }}
+                        style={{
+                          width: 50,
+                          height: 50,
+                          borderWidth: 1 
+                        }}
+                      />
+                      <View style={{margingLeft:10}}>
+                        <Text style={styles.text}>{item.author.first_name} {item.author.last_name}</Text>
+                        <Text style={styles.text}>{item.timestamp.slice(0,10)}</Text>
+                      </View>
+                    </View>
+                    <View style={{maring:10}}>
+                      <Text style={styles.text}>{item.text}</Text>
+                    </View>
                     {item.author.user_id == this.state.sessionUserID || this.state.isUsersProfile ?
-                      <View>
-                        <Button
-                          onPress={() => this.deletePost(item.post_id)}
-                          title="Delete"
-                        />
+                      <View style={styles.likeContianer}>
+                        <Text style={styles.likeText}>Likes: {item.numLikes}</Text>
+                        <TouchableOpacity
+                          style={styles.button}
+                          onPress={() => { this.deletePost(item.post_id); }}
+                        >
+                          <Text style={styles.buttonText}>DELETE</Text>
+                        </TouchableOpacity>
                       </View>
                       :
-                      <View>
-                        <Button
-                          onPress={() => this.likePost(item.post_id)}
-                          title="Like"
-                        />
-                        <Button
-                          onPress={() => this.unlikePost(item.post_id)}
-                          title="Unlike"
-                        />
+                      <View style={styles.likeContianer}>
+                        <Text style={styles.likeText}>Likes: {item.numLikes}</Text>
+                        <View style={{flexDirection:'row'}}>
+                          <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => {this.likePost(item.post_id); }}
+                          >
+                            <Text style={styles.buttonText}>LIKE</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => { this.unlikePost(item.post_id); }}
+                          >
+                            <Text style={styles.buttonText}>UNLIKE</Text>
+                          </TouchableOpacity>
+                        </View>
                       </View>
                     }
                   </View>
@@ -316,7 +405,9 @@ class Profile extends Component{
               />
             </View>
           </View>
+          
         </View>
+        </ScrollView>
       );
     }    
   }
@@ -325,12 +416,10 @@ class Profile extends Component{
 
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    justifyContent: 'center',
-    backgroundColor: '#fff000',
+  seperator: {
+    height: 5,
+    backgroundColor:'#d3d3d3',
+    marginVertical: 2,
   },
   container: {
     flex: 1,
@@ -339,17 +428,44 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     borderWidth: 1,
   },
-  formTitles: {
-    flex: 1,
-    fontFamily: 'Roboto',
-    fontSize: '100%'
+  likeContianer: {
+    flexDirection:'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   formInputs: {
-    flex: 1,
+    flex: 2,
     height: '40%',
     margin: '0.5%',
     borderWidth: 1,
     padding: '0.5%',
+    backgroundColor:'#ffffff',
+  },
+  button: {
+    backgroundColor: '#5643fd',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    alignSelf: 'flex-end',
+    alignItems: 'center',
+    borderRadius: 5
+  },
+  text: {
+    color: '#ffffff',
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  sectionHeaderText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 11,
+    marginVertical: 2,
+  },
+  likeText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
 })
 

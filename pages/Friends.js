@@ -252,7 +252,7 @@ class Friends extends Component{
                     :
                     <View>
                       <Button
-                        onPress={() => this.props.navigation.push("Other Profile", {id:item.user_id})}
+                        onPress={() => this.props.navigation.push("User", {id:item.user_id})}
                         title="View Profile"
                       />
                       <Button
@@ -282,7 +282,7 @@ class Friends extends Component{
                     />
                     :
                     <Button
-                      onPress={() => this.props.navigation.push("Other Profile", {id:item.user_id})}
+                      onPress={() => this.props.navigation.push("User", {id:item.user_id})}
                       title="View Profile"
                     />
                   }
@@ -302,7 +302,7 @@ class Friends extends Component{
                   <Text>Name: {item.first_name} {item.last_name} </Text>
                   <Text>Email: {item.email} </Text>
                   <Button
-                    onPress={() => this.props.navigation.navigate("Profile", {id:item.user_id})}
+                    onPress={() => this.props.navigation.navigate("User", {id:item.user_id})}
                     title="View Profile"
                   />
                   <Button

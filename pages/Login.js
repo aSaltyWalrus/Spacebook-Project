@@ -129,7 +129,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: '5%',
     flexDirection: 'row',
-    borderWidth: 1,
   },
   mainTitle: {
     flex: 16,
@@ -139,7 +138,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   formTitles: {
-    flex: 1,
+    height: 20,
     fontFamily: 'Roboto',
     fontSize: '100%',
     color: '#ffffff',

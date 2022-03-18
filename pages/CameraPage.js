@@ -60,7 +60,6 @@ class CameraPage extends Component{
     if(this.state.hasPermission){
       return(
         <View style={styles.container}>
-          <Text>Test</Text>
           <Camera 
             style={styles.camera} 
             type={this.state.type}

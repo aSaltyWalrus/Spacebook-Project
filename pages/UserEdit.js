@@ -73,8 +73,6 @@ class UserEdit extends Component{
         if (this.state.email != "") { to_send['email'] = this.state.email; }
         if (this.state.password != "") { to_send['password'] = this.state.password; }
 
-        console.log(JSON.stringify(to_send));
-
         return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.sessionUserID, {
             method: "PATCH",
             headers: {
@@ -134,14 +132,16 @@ class UserEdit extends Component{
       const navigation = this.props.navigation;
 
       return (
-        <ScrollView>
-        <View style={styles.screen}>
-            <View style={styles.container}>
-                <Text style={styles.formTitles}>Edit Profile</Text>
+        
+        <View style={{backgroundColor: '#0c164f', justifyContent: 'space-apart', alignItems: 'center', flex: 1}}>
+        <View style={styles.banner}></View>
+          <View style={{flex:2}}>
+            <View style={{ flex: 1, padding: 15, justifyContent: 'center'}}>
+                <Text style={{color: '#ffffff', fontWeight: 'bold', fontSize: 16}}>EDIT PROFILE</Text>
             </View>
 
             <View style={styles.container}>
-                <Text style={styles.formTitles}>forename</Text>
+                <Text style={styles.text}>forname</Text>
                 <TextInput
                     style={styles.formInputs}
                     onChangeText={(firstName) => this.setState({firstName})}
@@ -150,7 +150,7 @@ class UserEdit extends Component{
             </View>
 
             <View style={styles.container}>
-                <Text style={styles.formTitles}>surname</Text>
+                <Text style={styles.text}>surname</Text>
                 <TextInput
                     style={styles.formInputs}
                     onChangeText={(secondName) => this.setState({secondName})}
@@ -159,7 +159,7 @@ class UserEdit extends Component{
             </View>
 
             <View style={styles.container}>
-                <Text style={styles.formTitles}>email</Text>
+                <Text style={styles.text}>email</Text>
                 <TextInput
                     style={styles.formInputs}
                     onChangeText={(email) => this.setState({email})}
@@ -168,7 +168,7 @@ class UserEdit extends Component{
             </View>
 
             <View style={styles.container}>
-                <Text style={styles.formTitles}>password</Text>
+                <Text style={styles.text}>password</Text>
                 <TextInput
                     style={styles.formInputs}
                     onChangeText={(password) => this.setState({password})}
@@ -178,6 +178,7 @@ class UserEdit extends Component{
 
             <View style={styles.container}>
                 <Button
+                    color={'#5643fd'}
                     onPress={() => this.editUser()}
                     title="Commit Changes"
                 />
@@ -185,20 +186,15 @@ class UserEdit extends Component{
 
             <View style={styles.container}>
                 <Button
+                    color={'#ba1e68'}
                     onPress={() => this.logout()}
                     title="Logout"
                 />
             </View>
-            <View style={styles.container}>
-                <Button
-                    onPress={() => this.props.navigation.navigate('Camera Page')}
-                    title="Logout"
-                />
-            </View>
-            
-            <StatusBar style="auto" />
+          </View>  
+          <View style={styles.banner}></View>
         </View>
-        </ScrollView>
+        
 
       );
     }
@@ -206,31 +202,27 @@ class UserEdit extends Component{
 
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    justifyContent: 'center',
-    backgroundColor: '#fff000',
-  },
   container: {
     flex: 1,
-    backgroundColor: '#ff7700',
-    alignItems: 'center',
+    padding: 15,
     justifyContent: 'space-evenly',
-    borderWidth: 1,
   },
-  formTitles: {
+  formContainer: {
     flex: 1,
-    fontFamily: 'Roboto',
-    fontSize: '100%'
+    justifyContent: 'space-evenly',
+  },
+  banner: {
+    flex: 1
+  },
+  text: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   formInputs: {
-    flex: 1,
-    height: '40%',
-    margin: '0.5%',
+    height: 20,
     borderWidth: 1,
-    padding: '0.5%',
+    backgroundColor:'#ffffff',
   },
 })
 

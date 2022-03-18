@@ -139,10 +139,12 @@ class SignUp extends Component{
 
               <View style={styles.buttonContainer}>
                 <Button
+                  color={'#5643fd'}
                   onPress={() => this.props.navigation.popToTop()}
                   title="Back To Login"
                 />
                 <Button
+                  color={'#5643fd'}
                   onPress={() => this.createUser()}
                   title="Create Account"
                 />
@@ -179,7 +181,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: '5%',
     flexDirection: 'row',
-    borderWidth: 1,
   },
   mainTitle: {
     flex: 16,
