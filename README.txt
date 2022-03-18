@@ -1,0 +1,1 @@
+JavaScript style guide used: AirBnB (https://github.com/airbnb/javascript)
