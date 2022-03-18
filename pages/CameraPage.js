@@ -71,7 +71,7 @@ class CameraPage extends Component{
                 onPress={() => {
                   this.takePicture();
                 }}>
-                <Text style={styles.text}> Take Photo </Text>
+                <Text style={styles.buttonText}> Take Photo </Text>
               </TouchableOpacity>
             </View>
           </Camera>
@@ -99,14 +99,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     flexDirection: 'row',
     margin: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   button: {
-    flex: 0.1,
+    backgroundColor: '#5643fd',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     alignSelf: 'flex-end',
-    alignItems: 'center',
+    borderRadius: 5
   },
-  text: {
-    fontSize: 18,
-    color: 'white',
+  buttonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
 });

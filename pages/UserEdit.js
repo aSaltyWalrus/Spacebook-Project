@@ -141,7 +141,7 @@ class UserEdit extends Component{
             </View>
 
             <View style={styles.container}>
-                <Text style={styles.text}>forname</Text>
+                <Text style={styles.text}>forename</Text>
                 <TextInput
                     style={styles.formInputs}
                     onChangeText={(firstName) => this.setState({firstName})}

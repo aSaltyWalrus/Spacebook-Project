@@ -33,7 +33,7 @@ class BrowseUsers extends Component{
 		return (
 			<Stack.Navigator>
 				<Stack.Screen name="Friends" component={Friends} />
-				<Stack.Screen name="Profile" component={Profile} />
+				<Stack.Screen name="User" component={Profile} />
 			</Stack.Navigator>
 		);
 	}

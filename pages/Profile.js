@@ -75,6 +75,8 @@ class Profile extends Component{
                 return response.json()
             } else if (response.status === 401) {
                 this.props.navigation.navigate("Login");
+            } else if (response.status === 403) {
+                this.props.navigation.pop();
             } else {
                 throw 'Error: check server response';
             }
@@ -150,6 +152,8 @@ class Profile extends Component{
                 return response.json()
             } else if (response.status === 401) {
                 throw "Error: not authorized";
+            } else if (response.status === 403) {
+                this.props.navigation.pop();
             } else {
                 throw 'Error: check server response';
             }
@@ -293,20 +297,15 @@ class Profile extends Component{
       );
     } else {
       return (
+      <View style={{backgroundColor:'#0c164f', flex:1}}>
       <ScrollView>
-        <View style={{backgroundColor:'#0c164f'}}>
+        <View>
         
           <View style={{padding: 10}}>
             <View style={{flexDirection:'row'}}>
             <Image
-              source={{
-                uri: this.state.photo,
-              }}
-              style={{
-                width: 100,
-                height: 100,
-                borderWidth: 1 
-              }}
+              source={{ uri: this.state.photo, }}
+              style={{ width: 100, height: 100, borderWidth: 1, backgroundColor: '#ffffff' }}
             />
             <FlatList
               style={{padding: 5}}
@@ -315,19 +314,21 @@ class Profile extends Component{
                 <View>
                   <Text style={styles.buttonText}>{item.first_name} {item.last_name}</Text>
                   <Text style={styles.text}>email: {item.email}</Text>
+                  {!this.state.isUsersProfile ?
+                    <TouchableOpacity
+                      onPress={() => this.props.navigation.push("Friends", {id:this.state.profileID})}
+                    >
+                      <Text style={styles.buttonText}>View Friends</Text>
+                    </TouchableOpacity>
+                  :
+                    <Text style={styles.text}>This is you</Text>
+                  }
                 </View>
               )}
               keyExtractor={(item, index) => item.user_id.toString()}
             />
             </View>
-            {!this.state.isUsersProfile ?
-              <Button
-                onPress={() => this.props.navigation.push("Friends", {id:this.state.profileID})}
-                title="Friends"
-              />
-              :
-              <Text style={styles.text}> This is you </Text>
-            }
+            
             <View style={styles.seperator}></View>
             <View>
               <Text style={styles.sectionHeaderText}>Create New Post</Text>
@@ -353,21 +354,15 @@ class Profile extends Component{
                   <View style={{borderRadius:5 , padding: 5, backgroundColor: '#0c165f', marginVertical:10}}>
                     <View style={{flexDirection:'row'}}>
                       <Image
-                        source={{
-                          uri: this.getUserPicture(item.author.user_id)
-                        }}
-                        style={{
-                          width: 50,
-                          height: 50,
-                          borderWidth: 1 
-                        }}
+                        source={{ uri: this.getUserPicture(item.author.user_id) }}
+                        style={{ width: 50, height: 50, borderWidth: 1,  backgroundColor: '#ffffff' }}
                       />
-                      <View style={{margingLeft:10}}>
+                      <View style={{marginLeft:10}}>
                         <Text style={styles.text}>{item.author.first_name} {item.author.last_name}</Text>
                         <Text style={styles.text}>{item.timestamp.slice(0,10)}</Text>
                       </View>
                     </View>
-                    <View style={{maring:10}}>
+                    <View style={{margin:10}}>
                       <Text style={styles.text}>{item.text}</Text>
                     </View>
                     {item.author.user_id == this.state.sessionUserID || this.state.isUsersProfile ?
@@ -408,6 +403,7 @@ class Profile extends Component{
           
         </View>
         </ScrollView>
+        </View>
       );
     }    
   }
@@ -419,7 +415,7 @@ const styles = StyleSheet.create({
   seperator: {
     height: 5,
     backgroundColor:'#d3d3d3',
-    marginVertical: 2,
+    marginVertical: 4,
   },
   container: {
     flex: 1,
@@ -432,6 +428,11 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     justifyContent: 'space-between',
     alignItems: 'center'
+  },
+  likeText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   formInputs: {
     flex: 2,
@@ -461,11 +462,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 11,
     marginVertical: 2,
-  },
-  likeText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 12,
   },
 })
 
