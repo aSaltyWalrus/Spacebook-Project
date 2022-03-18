@@ -37,7 +37,7 @@ class SignUp extends Component{
 
         .then((response) => {
             if(response.status === 201){
-                this.signIn()
+                this.signIn() // automatically log into the newly created user
             }else if(response.status === 400){
                 throw 'invalid credentials';
             }else{
@@ -89,11 +89,7 @@ class SignUp extends Component{
 
 
     render(){
-
-      const navigation = this.props.navigation;
-
       return (
-        
         <View style={styles.screen}>
           <View style={styles.banner}></View>
           <View style={styles.mainContainer}>

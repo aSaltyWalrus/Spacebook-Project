@@ -45,12 +45,13 @@ class CameraPage extends Component{
       })
   }
 
+    // take a picture using the camera
     takePicture = async () => {
         if(this.camera){
             const options = {
                 quality: 0.5, 
                 base64: true,
-                onPictureSaved: (data) => this.sendToServer(data)
+                onPictureSaved: (data) => this.sendToServer(data) // send the picture to the server once taken
             };
             await this.camera.takePictureAsync(options); 
         } 

@@ -17,6 +17,8 @@ class Login extends Component{
 
     signIn = () => {
         console.log("signing in...");
+        // create a to send variable so that the values inputted can be transformed into
+        // JSON and sent with the post request
         let to_send = {
             email: this.state.email,
             password: this.state.password
@@ -29,7 +31,9 @@ class Login extends Component{
             },
             body: JSON.stringify(to_send)
         })
-        
+       
+        // check the servers response, and if it response 200 continue else throw the 
+        // correstonding error message
        .then((response) => {
             if (response.status === 200){
                 return response.json()
@@ -40,6 +44,9 @@ class Login extends Component{
             }
         })
         
+        // set both the session token and user id in async storage so that they can be used
+        // as headers in the future, the id will also be used to check if the user is on 
+        // their profile/friends list
        .then( async (responseJson) => {
             await AsyncStorage.setItem('@session_token', responseJson.token);
             await AsyncStorage.setItem('@id', responseJson.id);
@@ -53,9 +60,6 @@ class Login extends Component{
 
 
     render(){
-
-      const navigation = this.props.navigation;
-
       return (
       <View style={styles.screen}>
           <View style={styles.banner}></View>
@@ -118,7 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   banner: {
-        flex: 1
+    flex: 1
   },
     container: {
     flex: 2,

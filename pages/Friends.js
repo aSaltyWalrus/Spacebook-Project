@@ -205,6 +205,7 @@ class Friends extends Component{
         })
     }
 
+    // unfinished function
     getUserPicture(user_id) {
         return fetch("http://localhost:3333/api/1.0.0/user/" + user_id + "/photo", {
             'headers': {
@@ -270,7 +271,7 @@ class Friends extends Component{
                   <View style={{flex:1,flexDirection:'row'}}>
                     <View style={styles.userDataContainer}>
                       <Image
-                        source={{ uri: this.getUserPicture(item.user_id) }}
+                        source={{ uri: null }}// would usually call getUserPicture(item.user_id), however the function iisnt finished
                         style={styles.image}
                       />
                       <View style={{marginLeft: 10}}>
@@ -319,7 +320,7 @@ class Friends extends Component{
                     <View style={{flex:1,flexDirection:'row'}}>
                       <View style={styles.userDataContainer}>
                         <Image
-                          source={{ uri: this.getUserPicture(item.user_id) }}
+                          source={{ uri:  null }}// would usually call getUserPicture(item.user_id), however the function iisnt finished
                           style={styles.image}
                         />
                         <View style={{marginLeft: 10}}>
@@ -379,7 +380,7 @@ class Friends extends Component{
                         <View style={{flex:1,flexDirection:'row'}}>
                           <View style={styles.userDataContainer}>
                             <Image
-                              source={{ uri: this.getUserPicture(item.user_id) }}
+                              source={{ uri:  null }}// would usually call getUserPicture(item.user_id), however the function iisnt finished
                               style={styles.image}
                             />
                             <View style={{marginLeft: 10}}>

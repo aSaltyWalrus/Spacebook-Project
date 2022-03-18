@@ -12,7 +12,6 @@ class Profile extends Component{
             isLoading: true,
             profileData: [],
             profileID: 0,
-            isUsersProfile: false,
             profilePhoto: "",
             profilePostsData: "",
             newPostText: "",
@@ -22,8 +21,8 @@ class Profile extends Component{
 
     componentDidMount() {
         this.unsubscribe = this.props.navigation.addListener('focus', () => {
-            this.checkLoggedIn();
-            this.getProfileData();
+            this.checkLoggedIn(); // verify if the user is logged in
+            this.getProfileData(); // if no error with verification, load profile data
         }); 
     }
 
@@ -44,7 +43,8 @@ class Profile extends Component{
     getProfileData = async () => {
         const token = await AsyncStorage.getItem('@session_token');
         const userID = await AsyncStorage.getItem('@id');
-
+        // store the profileID, the session user id and session token for use in further fetch requests
+        // if there is not paramaters from the navigation, the profile is the current users
         if (this.props.route.params != null) {
             this.setState({
                 profileID: this.props.route.params.id,
@@ -58,11 +58,6 @@ class Profile extends Component{
                 sessionUserID: userID,
             })
         } 
-        if (this.state.profileID == userID) {
-            this.setState({
-                isUsersProfile: true
-            })
-        }
 
         return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID, {
             'headers': {
@@ -117,6 +112,7 @@ class Profile extends Component{
         });
     }
 
+    // unfinished function
     getUserPicture(user_id) {
         return fetch("http://localhost:3333/api/1.0.0/user/" + user_id + "/photo", {
             'headers': {
@@ -130,7 +126,9 @@ class Profile extends Component{
 
         .then((resBlob) => {
             let data = URL.createObjectURL(resBlob);
-            return data;
+            this.setState({
+                tempPhoto: data
+            })
         })
 
         .catch((err) => {
@@ -164,13 +162,14 @@ class Profile extends Component{
                 profilePostsData: responseJson,
                 isLoading: false,
             })
-            
+            // once all the posts are loaded, set isLoading to false so the profile can display
         })
 
         .catch((error) => {
             console.log(error);
         })
     }
+
 
 
     createNewPost() {
@@ -229,7 +228,7 @@ class Profile extends Component{
         })
     }
 
-
+    // get the id of the post from the FlatList and retrive the profile id from the state
     likePost(post_id) {
         return fetch("http://localhost:3333/api/1.0.0/user/" + this.state.profileID + "/post/" + post_id + "/like", {
             method: "post",
@@ -297,112 +296,111 @@ class Profile extends Component{
       );
     } else {
       return (
-      <View style={{backgroundColor:'#0c164f', flex:1}}>
-      <ScrollView>
-        <View>
-        
-          <View style={{padding: 10}}>
-            <View style={{flexDirection:'row'}}>
-            <Image
-              source={{ uri: this.state.photo, }}
-              style={{ width: 100, height: 100, borderWidth: 1, backgroundColor: '#ffffff' }}
-            />
-            <FlatList
-              style={{padding: 5}}
-              data={this.state.profileData}
-              renderItem={({item}) => ( 
-                <View>
-                  <Text style={styles.buttonText}>{item.first_name} {item.last_name}</Text>
-                  <Text style={styles.text}>email: {item.email}</Text>
-                  {!this.state.isUsersProfile ?
-                    <TouchableOpacity
-                      onPress={() => this.props.navigation.push("Friends", {id:this.state.profileID})}
-                    >
-                      <Text style={styles.buttonText}>View Friends</Text>
-                    </TouchableOpacity>
-                  :
-                    <Text style={styles.text}>This is you</Text>
-                  }
-                </View>
-              )}
-              keyExtractor={(item, index) => item.user_id.toString()}
-            />
-            </View>
-            
-            <View style={styles.seperator}></View>
+        <View style={{backgroundColor:'#0c164f', flex:1}}>
+          <ScrollView>
             <View>
-              <Text style={styles.sectionHeaderText}>Create New Post</Text>
-              <TextInput
-                style={styles.formInputs}
-                onChangeText={(newPostText) => this.setState({newPostText})}
-                value={this.state.newPostText}
-              />
-              
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => { this.createNewPost(); }}
-              >
-                <Text style={styles.buttonText}>POST</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.seperator}></View>
-            <View>
-              <Text style={styles.sectionHeaderText}>Posts</Text>
-              <FlatList
-                data={this.state.profilePostsData}
-                renderItem={({item}) => ( 
-                  <View style={{borderRadius:5 , padding: 5, backgroundColor: '#0c165f', marginVertical:10}}>
-                    <View style={{flexDirection:'row'}}>
-                      <Image
-                        source={{ uri: this.getUserPicture(item.author.user_id) }}
-                        style={{ width: 50, height: 50, borderWidth: 1,  backgroundColor: '#ffffff' }}
-                      />
-                      <View style={{marginLeft:10}}>
-                        <Text style={styles.text}>{item.author.first_name} {item.author.last_name}</Text>
-                        <Text style={styles.text}>{item.timestamp.slice(0,10)}</Text>
-                      </View>
-                    </View>
-                    <View style={{margin:10}}>
-                      <Text style={styles.text}>{item.text}</Text>
-                    </View>
-                    {item.author.user_id == this.state.sessionUserID || this.state.isUsersProfile ?
-                      <View style={styles.likeContianer}>
-                        <Text style={styles.likeText}>Likes: {item.numLikes}</Text>
+              <View style={{padding: 10}}>
+                <View style={{flexDirection:'row'}}>
+                <Image
+                  source={{ uri: this.state.profilePhoto, }}
+                  style={{ width: 100, height: 100, borderWidth: 1, backgroundColor: '#ffffff' }}
+                />
+                <FlatList
+                  style={{padding: 5}}
+                  data={this.state.profileData}
+                  renderItem={({item}) => ( 
+                    <View>
+                      <Text style={styles.buttonText}>{item.first_name} {item.last_name}</Text>
+                      <Text style={styles.text}>email: {item.email}</Text>
+                      {this.state.sessionUserID == this.state.profileID ?
                         <TouchableOpacity
-                          style={styles.button}
-                          onPress={() => { this.deletePost(item.post_id); }}
+                          onPress={() => this.props.navigation.push("Friends", {id:this.state.profileID})}
                         >
-                          <Text style={styles.buttonText}>DELETE</Text>
+                          <Text style={styles.buttonText}>View Friends</Text>
                         </TouchableOpacity>
-                      </View>
                       :
-                      <View style={styles.likeContianer}>
-                        <Text style={styles.likeText}>Likes: {item.numLikes}</Text>
-                        <View style={{flexDirection:'row'}}>
-                          <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {this.likePost(item.post_id); }}
-                          >
-                            <Text style={styles.buttonText}>LIKE</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => { this.unlikePost(item.post_id); }}
-                          >
-                            <Text style={styles.buttonText}>UNLIKE</Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    }
+                        <Text style={styles.text}>This is you</Text>
+                      }
+                    </View>
+                  )}
+                  keyExtractor={(item, index) => item.user_id.toString()}
+                />
+                </View>
+            
+                <View style={styles.seperator}></View>
+                  <View>
+                    <Text style={styles.sectionHeaderText}>Create New Post</Text>
+                    <TextInput
+                      style={styles.formInputs}
+                      onChangeText={(newPostText) => this.setState({newPostText})}
+                      value={this.state.newPostText}
+                    />
+              
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => { this.createNewPost(); }}
+                    >
+                      <Text style={styles.buttonText}>POST</Text>
+                    </TouchableOpacity>
                   </View>
-                )}
-                keyExtractor={(item, index) => item.post_id}
-              />
-            </View>
-          </View>
+                <View style={styles.seperator}></View>
+                <View>
+                  <Text style={styles.sectionHeaderText}>Posts</Text>
+                  <FlatList
+                    data={this.state.profilePostsData}
+                    renderItem={({item}) => ( 
+                      <View style={{borderRadius:5 , padding: 5, backgroundColor: '#0c165f', marginVertical:10}}>
+                        <View style={{flexDirection:'row'}}>
+                          <Image
+                            source={{ uri: null }}// would usually call getUserPicture(item.author.user_id), however the function iisnt finished
+                            style={{ width: 50, height: 50, borderWidth: 1,  backgroundColor: '#ffffff' }}
+                          />
+                          <View style={{marginLeft:10}}>
+                            <Text style={styles.text}>{item.author.first_name} {item.author.last_name}</Text>
+                            <Text style={styles.text}>{item.timestamp.slice(0,10)}</Text>
+                          </View>
+                        </View>
+                        <View style={{margin:10}}>
+                          <Text style={styles.text}>{item.text}</Text>
+                        </View>
+                        {item.author.user_id == this.state.sessionUserID || this.state.sessionUserID == this.state.profileID ?
+                          <View style={styles.likeContianer}>
+                            <Text style={styles.likeText}>Likes: {item.numLikes}</Text>
+                            <TouchableOpacity
+                              style={styles.button}
+                              onPress={() => { this.deletePost(item.post_id); }}
+                            >
+                              <Text style={styles.buttonText}>DELETE</Text>
+                            </TouchableOpacity>
+                          </View>
+                          :
+                          <View style={styles.likeContianer}>
+                            <Text style={styles.likeText}>Likes: {item.numLikes}</Text>
+                            <View style={{flexDirection:'row'}}>
+                              <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => {this.likePost(item.post_id); }}
+                              >
+                                <Text style={styles.buttonText}>LIKE</Text>
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => { this.unlikePost(item.post_id); }}
+                              >
+                                <Text style={styles.buttonText}>UNLIKE</Text>
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                        }
+                      </View>
+                    )}
+                    keyExtractor={(item, index) => item.post_id}
+                  />
+                </View>
+              </View>
           
-        </View>
-        </ScrollView>
+            </View>
+          </ScrollView>
         </View>
       );
     }    

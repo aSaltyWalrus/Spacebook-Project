@@ -15,6 +15,8 @@ import CameraPage from './pages/CameraPage';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// 3 different classes for embedment of Navigator
+
 class App extends Component{
 	render(){
 		return (
